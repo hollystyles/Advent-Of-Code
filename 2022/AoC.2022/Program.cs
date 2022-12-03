@@ -3,7 +3,7 @@ var app = builder.Build();
 
 app.MapGet("/day/1", () => { 
 
-    return Solutions.Day1Output().ToString();
+    return Solutions.Day1Output();
 });
 
 app.Run();
@@ -11,12 +11,12 @@ app.Run();
 
 static class Solutions
 {
-    public static int Day1Output()
+    public static string Day1Output()
     {
         var day1InputFile = new StreamReader(@"inputs\day1\input.txt");
 
         string? line = "";
-        int max = 0;
+        var elfCalories = new List<int>();
         int sum = 0;
 
         while(line != null)
@@ -25,16 +25,18 @@ static class Solutions
 
             if(string.IsNullOrEmpty(line))
             {
-                max = Math.Max(max, sum);
+                elfCalories.Add(sum);
                 sum = 0;
             }
             else
             {
                 sum += int.Parse(line);
-            }
-            
+            }            
         }
 
-        return max;
+        var part1 = elfCalories.Max();
+        var part2 = elfCalories.OrderByDescending(c => c).Take(3).Sum();
+
+        return $"Part1: {part1}; Part2: {part2}";
     }
 }
