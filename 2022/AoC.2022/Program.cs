@@ -13,7 +13,7 @@ static class Solutions
 {
     public static int Day1Output()
     {
-        var day1InputFile = new StreamReader(@"C:\Users\PaulAlcon\source\repos\AdventofCode\2022\AoC.2022\inputs\day1\input.txt");
+        var day1InputFile = new StreamReader(@"inputs\day1\input.txt");
 
         string? line = "";
         int max = 0;
@@ -22,7 +22,7 @@ static class Solutions
         while(line != null)
         {
             line = day1InputFile.ReadLine();
-            
+
             if(string.IsNullOrEmpty(line))
             {
                 max = Math.Max(max, sum);
