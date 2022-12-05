@@ -21,11 +21,100 @@ app.MapGet("/day/4", () => {
     return Solutions.Day4Output();
 });
 
+app.MapGet("/day/5", () => { 
+
+    return Solutions.Day5Output();
+});
+
 app.Run();
 
 
 static class Solutions
 {
+    public static string Day5Output()
+    {
+        var stacks1 = new Dictionary<int, Stack<char>>(9);
+        var stacks2 = new Dictionary<int, Stack<char>>(9);
+        for(var i = 0; i < 9; i++)
+        {
+            stacks1.Add(i, new Stack<char>());
+            stacks2.Add(i, new Stack<char>());
+        }
+
+        var dayInputFile = new StreamReader(@"inputs\day5\input.txt");
+
+        string? line = "- -";
+
+        while(line != null)
+        {
+            line = dayInputFile.ReadLine();
+            
+            if(!string.IsNullOrEmpty(line))
+            {
+                if(line.IndexOf("[") > -1)
+                {
+                    for(int i=0, j=0; i <  36; i+=4, j++)
+                    {
+                        var crate = line.Substring(i, 3).Replace("[", "").Replace("]", "").Trim();
+                        if(!string.IsNullOrEmpty(crate))
+                        {
+                            stacks1[j].Push(crate[0]);
+                            stacks2[j].Push(crate[0]);
+                        }
+
+                    }
+                }
+                else if(line.StartsWith(" 1"))
+                {
+                    for(int i = 0; i < 9; i++)
+                    {
+                        var revStack1 = new Stack<char>();
+                        var revStack2 = new Stack<char>();
+                        while(stacks1[i].Count > 0)
+                        {
+                            revStack1.Push(stacks1[i].Pop());
+                            revStack2.Push(stacks2[i].Pop());
+                        }
+                        stacks1[i] = revStack1;
+                        stacks2[i] = revStack2;
+                    }
+                }
+                else if(line.StartsWith("move"))
+                {
+                    var moves = line.Split(' ');
+                    var count = int.Parse(moves[1]);
+                    var from = int.Parse(moves[3]) - 1;
+                    var to = int.Parse(moves[5]) - 1;
+                    var revStack = new Stack<char>();
+
+                    for(int i = 0; i < count; i++)
+                    {
+                        stacks1[to].Push(stacks1[from].Pop());
+                        revStack.Push(stacks2[from].Pop());
+                    }
+                    while(revStack.Count > 0)
+                    {
+                        stacks2[to].Push(revStack.Pop());
+                    }
+                }
+            }
+        }
+        
+        var result1 = "";
+        for(int i = 0; i < 9; i++)
+        {
+            result1 += stacks1[i].Peek();
+        }
+
+        var result2 = "";
+        for(int i = 0; i < 9; i++)
+        {
+            result2 += stacks2[i].Peek();
+        }
+
+        return $"Partt1: {result1}, Part2: {result2}";
+    }
+
     public static string Day4Output()
     {
         var dayInputFile = new StreamReader(@"inputs\day4\input.txt");
