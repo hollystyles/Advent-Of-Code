@@ -16,11 +16,54 @@ app.MapGet("/day/3", () => {
     return Solutions.Day3Output();
 });
 
+app.MapGet("/day/4", () => { 
+
+    return Solutions.Day4Output();
+});
+
 app.Run();
 
 
 static class Solutions
 {
+    public static string Day4Output()
+    {
+        var dayInputFile = new StreamReader(@"inputs\day4\input.txt");
+
+        string? line = "- -";
+        var sum1 = 0;
+        var sum2 = 0;
+
+        while(line != null)
+        {
+            line = dayInputFile.ReadLine();
+            
+            if(!string.IsNullOrEmpty(line))
+            {
+                var ranges = line.Split(',');
+                var range1 = ranges[0].Split('-');
+                var range2 = ranges[1].Split('-');
+                var min1 = int.Parse(range1[0]);
+                var max1 = int.Parse(range1[1]);
+                var min2 = int.Parse(range2[0]);
+                var max2 = int.Parse(range2[1]);
+
+                //one range is fully encapsulated in the other
+                if((min1 >= min2 && max1 <= max2) || (min2 >= min1 && max2 <= max1))
+                {
+                    sum1++;
+                    sum2++;
+                }//Ranges overlap
+                else if((min2 <= min1 && min1 <= max2) || (min1 <= min2 && min2 <= max1))
+                {
+                    sum2++;
+                }
+            }
+        }
+
+        return $"Part1: {sum1}, Part2: {sum2}";
+    }
+
     public static string Day3Output()
     {
         var lookup = new Dictionary<char, int>{
