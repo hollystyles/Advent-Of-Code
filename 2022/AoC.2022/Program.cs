@@ -11,11 +11,62 @@ app.MapGet("/day/2", () => {
     return Solutions.Day2Output();
 });
 
+app.MapGet("/day/3", () => { 
+
+    return Solutions.Day3Output();
+});
+
 app.Run();
 
 
 static class Solutions
 {
+    public static string Day3Output()
+    {
+        var lookup = new Dictionary<char, int>{
+            {'a', 1},{'b', 2},{'c', 3},{'d', 4},{'e', 5},{'f', 6},{'g', 7},{'h', 8},{'i', 9},{'j', 10},{'k', 11},{'l', 12},{'m', 13},
+            {'n', 14},{'o', 15},{'p', 16},{'q', 17},{'r', 18},{'s', 19},{'t', 20},{'u', 21},{'v', 22},{'w', 23},{'x', 24},{'y', 25},{'z', 26},
+            {'A', 27},{'B', 28},{'C', 29},{'D', 30},{'E', 31},{'F', 32},{'G', 33},{'H', 34},{'I', 35},{'J', 36},{'K', 37},{'L', 38},{'M', 39},
+            {'N', 40},{'O', 41},{'P', 42},{'Q', 43},{'R', 44},{'S', 45},{'T', 46},{'U', 47},{'V', 48},{'W', 49},{'X', 50},{'Y', 51},{'Z', 52}
+        };
+
+        var dayInputFile = new StreamReader(@"inputs\day3\input.txt");
+
+        string? line = "- -";
+        int lineCounter = 0;
+        int modulo = 0;
+        Dictionary<int, char[]> elfGroup = new Dictionary<int, char[]>(3);
+        var sum1 = 0;
+        var sum2 = 0;
+
+        while(line != null)
+        {
+            line = dayInputFile.ReadLine();
+            lineCounter++;
+            modulo = lineCounter % 3;
+
+            if(!string.IsNullOrEmpty(line))
+            {
+                elfGroup[modulo] = line.ToCharArray();
+                var count = line.Length / 2;
+                var left = line.Substring(0, count).ToCharArray();
+                var right = line.Substring(count, count).ToCharArray();
+
+                var matched = left.Where(c => right.Contains(c)).ToArray();
+
+                sum1 += matched.Take(1).Select(c => lookup[c]).Sum();
+
+                if(modulo == 0)
+                {
+                    var badge = elfGroup[0].Where(b => elfGroup[1].Contains(b) && elfGroup[2].Contains(b)).First();
+                    sum2 += lookup[badge];
+                }
+            }
+        }
+
+        return $"Part1: {sum1}, Part2: {sum2}";
+    }
+
     public static string Day2Output()
     {
         var lookup1 = new Dictionary<string, int>{
