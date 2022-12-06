@@ -26,11 +26,70 @@ app.MapGet("/day/5", () => {
     return Solutions.Day5Output();
 });
 
+app.MapGet("/day/6", () => { 
+
+    return Solutions.Day6Output();
+});
+
 app.Run();
 
 
 static class Solutions
 {
+    public static string Day6Output()
+    {
+        var dayInputFile = new StreamReader(@"inputs\day6\input.txt");
+
+        string line = "- -";
+        var pos = 0;
+        var p_sequence = new Queue<char>(4);
+        var m_sequence = new Queue<char>(14);
+        var p_marker = 0;
+        var m_marker = 0;
+
+        while(line != null)
+        {
+            line = dayInputFile.ReadLine();
+
+            if(!string.IsNullOrEmpty(line))
+            {
+                foreach(var c in line)
+                {
+                    pos++;
+                    p_sequence.Enqueue(c);
+                    m_sequence.Enqueue(c);
+
+                    if(pos >= 4)
+                    {
+                        if(p_marker == 0 && p_sequence.Distinct().Count() == 4)
+                        {
+                            p_marker = pos;
+                        }
+                            
+                        _ = p_sequence.Dequeue();
+                    }
+
+                    if(pos >= 14)
+                    {
+                        if(m_marker == 0 && m_sequence.Distinct().Count() == 14)
+                        {
+                            m_marker = pos;
+                        }
+
+                        _ = m_sequence.Dequeue();
+                    }
+
+                    if(p_marker > 0 && m_marker > 0)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $"Part1: {p_marker}, Part2: {m_marker}";
+    }
+
     public static string Day5Output()
     {
         var stacks1 = new Dictionary<int, Stack<char>>(9);
