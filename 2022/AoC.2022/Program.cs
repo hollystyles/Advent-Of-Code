@@ -31,11 +31,138 @@ app.MapGet("/day/6", () => {
     return Solutions.Day6Output();
 });
 
+app.MapGet("/day/7", () => { 
+
+    return Solutions.Day7Output();
+});
+
 app.Run();
 
 
 static class Solutions
 {
+    public static string Day7Output()
+    {
+        var dayInputFile = new StreamReader(@"inputs\day7\input.txt");
+
+        string line = "- -";
+        var rootDir = new Directory("/", null);
+        var currentDir = rootDir;
+
+        while(line != null)
+        {
+            line = dayInputFile.ReadLine();
+
+            if(!string.IsNullOrEmpty(line))
+            {
+                var command = line.Split(' ');
+                
+                if(command[0] == "$")
+                {
+                    if(command[1] == "cd")
+                    {
+                        if(command[2] == "..")
+                        {
+                            currentDir = currentDir.Parent;
+                        }
+                        else if(command[2] != "/")
+                        {
+                            currentDir = currentDir.Children.First(d => d.Name == command[2]) as Directory;
+                        }
+                    }
+                }
+                else if(command[0] == "dir")
+                {
+                    currentDir.AddChild(new Directory(command[1], currentDir));
+                }
+                else
+                {
+                    currentDir.AddChild(new File(command[1], int.Parse(command[0])));
+                }
+
+            }
+        }
+
+        var dirs = Collect(new List<Directory>(), rootDir, (Directory d) => {return d.Size <= 100000;});
+
+        var sum1 = dirs.Select(d => d.Size).Sum();
+
+        var spaceRequired = 30000000 - (70000000 - rootDir.Size);
+
+        dirs = Collect(new List<Directory>(), rootDir, (Directory d) => {return d.Size >= spaceRequired;});
+
+        var sum2 = dirs.Select(d => d.Size).Min();
+
+        return $"Part1: {sum1}, Part2: {sum2}";
+    }
+
+    private static List<Directory> Collect(List<Directory> dirs, Directory dir, Func<Directory, bool> predicate)
+    {
+        if(predicate(dir))
+            dirs.Add(dir);
+
+        foreach(var child in dir.Children)
+        {
+            if(child is Directory)
+            {
+                dirs = Collect(dirs, child as Directory, predicate);
+            }
+        }
+
+        return dirs;
+    }
+
+    public class Directory : FileSystemObject
+    {
+        private Directory _parent;
+
+        private List<FileSystemObject> _children = new List<FileSystemObject>();
+
+        public Directory(string name, Directory parent)
+        : base(name)
+        { 
+            _parent = parent;
+        }
+
+        public override int Size => _children.Select(f => f.Size).Sum();
+
+        public Directory Parent { get { return _parent; } }
+
+        public IEnumerable<FileSystemObject> Children { get { return _children; } }
+
+        public void AddChild(FileSystemObject fso)
+        {
+            _children.Add(fso);
+        }
+    }
+
+    public class File : FileSystemObject
+    {
+        protected int _size;
+
+        public File(string name, int size)
+        : base(name)
+        { 
+            _size = size;
+        }
+
+        public override int Size { get { return _size;} }
+    }
+
+    public abstract class FileSystemObject
+    {
+        protected string _name;
+
+        protected FileSystemObject(string name)
+        {
+            _name = name;
+        }
+
+        public virtual string Name { get { return _name; } }
+
+        public virtual int Size {get;}
+    }
+
     public static string Day6Output()
     {
         var dayInputFile = new StreamReader(@"inputs\day6\input.txt");
