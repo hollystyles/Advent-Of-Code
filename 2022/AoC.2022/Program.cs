@@ -36,11 +36,110 @@ app.MapGet("/day/7", () => {
     return Solutions.Day7Output();
 });
 
+app.MapGet("/day/8", () => { 
+
+    return Solutions.Day8Output();
+});
+
 app.Run();
 
 
 static class Solutions
 {
+    public static string Day8Output()
+    {
+        var dayInputFile = new StreamReader(@"inputs\day8\input.txt");
+
+        int sum1 = 0;
+        int sum2 = 0;
+        List<string> rows = new List<string>();
+        string line = "-";        
+
+        while(line != null)
+        {
+            line = dayInputFile.ReadLine();
+
+            if(!string.IsNullOrEmpty(line))
+            {
+                rows.Add(line);
+            }
+        }
+
+        int maxY = rows.Count() - 1;
+        int maxX = rows[0].Length - 1;
+        int vn = 0, ve = 0, vs = 0, vw = 0;      
+        char curH = '0';  
+
+        for(int y = 1; y < maxY; y++)
+        {
+            for(int x = 1; x < maxX; x++)
+            {
+                vn = ve = vs = vw = 0;
+                curH = rows[y][x];
+
+                var north = rows.Select(r => r[x]).Take(y).Reverse();
+                foreach(var t in north)
+                {
+                    vn++;
+                    if(t >= curH)
+                        break;
+                }
+
+                var east = rows[y].Substring(x+1);
+                foreach(var t in east)
+                {
+                    ve++;
+                    if(t >= curH)
+                        break;
+                }
+
+                var south = rows.Select(r => r[x]).Skip(y+1);
+                foreach(var t in south)
+                {
+                    vs++;
+                    if(t >= curH)
+                        break;
+                }
+
+                var west = rows[y].Substring(0,x).Reverse();
+                foreach(var t in west)
+                {
+                    vw++;
+                    if(t >= curH)
+                        break;
+                }
+
+                sum2 = Math.Max((vn * ve * vs * vw), sum2);
+
+                if(curH > '0')
+                {
+                    //North check (no tree equal or higer)
+                    if(!north.Any(h => h >= curH))
+                    {
+                        sum1++;
+                    }//East check (no tree equal or higer)
+                    else if(!east.Any(h => h >= curH))
+                    {
+                        sum1++;
+                    }//South check (no tree equal or higer)
+                    else if(!south.Any(h => h >= curH))
+                    {
+                        sum1++;
+                    }//West check (no tree equal or higer)
+                    else if(!west.Any(h => h >= curH))
+                    {
+                        sum1++;
+                    }
+                }
+            }
+        }
+
+        //Add all perimeter trees
+        sum1 += ( ( rows[0].Length * 2 ) + ( ( rows.Count() - 2 ) * 2 ) );
+        
+        return $"Part1: {sum1}, Part2: {sum2}";
+    }
+
     public static string Day7Output()
     {
         var dayInputFile = new StreamReader(@"inputs\day7\input.txt");
